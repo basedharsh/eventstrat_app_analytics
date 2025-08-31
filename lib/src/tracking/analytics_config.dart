@@ -1,8 +1,4 @@
-enum DeviceIdStrategy {
-  methodChannel, // existing method channel approach
-  hardwareId, // Use device_info_plus for actual hardware ID
-  generated, // Generate and persist a UUID
-}
+enum DeviceIdStrategy { methodChannel, hardwareId, generated }
 
 class AnalyticsConfig {
   final String targetProduct;
