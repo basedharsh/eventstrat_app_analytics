@@ -30,7 +30,15 @@ class EventstratAnalytics {
     _isInitialized = true;
   }
 
-  // Rest of the class remains the same...
+  static Future<void> updateUser({String? email, String? cohort}) async {
+    if (!_isInitialized) {
+      throw StateError('EventstratAnalytics not initialized.');
+    }
+
+    // Update EventManager's config
+    await EventManager.updateUser(email: email, cohort: cohort);
+  }
+
   static Future<void> track({
     required String event,
     required String screen,

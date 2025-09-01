@@ -18,6 +18,27 @@ class EventManager {
     );
   }
 
+  static Future<void> updateUser({String? email, String? cohort}) async {
+    if (_config == null) {
+      log('EventManager not initialized');
+      return;
+    }
+
+    _config = _config!.copyWith(userEmail: email, userCohort: cohort);
+
+    final prefs = await SharedPreferences.getInstance();
+    if (email != null) {
+      await prefs.setString('user_email', email);
+    }
+    if (cohort != null) {
+      await prefs.setString('user_cohort', cohort);
+    }
+
+    if (_config!.enableDebugMode) {
+      log('User info updated: email=$email, cohort=$cohort');
+    }
+  }
+
   static Future<void> sendEventFirebase({
     required String eventName,
     required String screenName,
