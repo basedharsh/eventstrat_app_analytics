@@ -72,7 +72,9 @@ class EventManager {
       cohort: cohort,
       version: packageInfo.version,
     );
-    log("The each event data is : ${await eventDTO.toJson(config: _config)}");
+    log(
+      "Target Product : ${targetProduct ?? _config!.targetProduct}, Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
+    );
 
     await _invoker!.storeEventToLocal(
       eventData: await eventDTO.toJson(config: _config),
