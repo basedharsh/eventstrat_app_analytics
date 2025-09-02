@@ -1,5 +1,3 @@
-// lib/constants/analytics_constants.dart
-
 class EventScreenName {
   // Main app screens
   static const splash = 'splash_screen';
@@ -15,7 +13,6 @@ class EventScreenName {
   // Auth screens
   static const authOptions = 'auth_options_screen';
   static const registration = 'registration_screen';
-  static const privacyPolicy = 'privacy_policy_screen';
   static const forgotPassword = 'forgot_password_screen';
   static const forgotPasswordOtp = 'forgot_password_otp_screen';
   static const resetPassword = 'reset_password_screen';
@@ -23,11 +20,7 @@ class EventScreenName {
   // Profile related screens
   static const bookmarkScreen = 'bookmark_screen';
   static const scannedContacts = 'scanned_contacts_screen';
-  static const profileEdit = 'profile_edit_screen';
   static const profilePhotoEdit = 'profile_photo_edit_screen';
-  static const profileAbout = 'profile_about_screen';
-  static const profileSocialLinks = 'profile_social_links_screen';
-  static const profileBasicInfo = 'profile_basic_info_screen';
 
   // Exhibitor screens
   static const exhibitorsList = 'exhibitors_list_screen';
@@ -50,7 +43,6 @@ class EventScreenName {
 
   // Lead wallet screens
   static const viewProfile = 'view_profile_screen';
-  static const leadWallet = 'lead_wallet_screen';
 
   // Ticket screens
   static const createTicket = 'create_ticket_screen';
@@ -59,7 +51,6 @@ class EventScreenName {
 
   // Utility screens
   static const webView = 'web_view_screen';
-  static const pdfViewer = 'pdf_viewer_screen';
   static const qrScanner = 'qr_scanner_screen';
   static const eventUserQr = 'event_user_qr_screen';
   static const maintenance = 'maintenance_screen';
@@ -76,11 +67,5 @@ class EventScreenName {
   static const aboutUttarPradesh = 'about_uttar_pradesh_screen';
 
   // Event specific screens
-  static const eventAtGlance = 'event_at_glance_screen';
-  static const iheFood = 'ihe_food_screen';
   static const floorPlanDisplay = 'floor_plan_display_screen';
-  static const floorPlanNavigation = 'floor_plan_navigation_screen';
-
-  // Agenda screens
-  static const eventAgendaDetails = 'event_agenda_details_screen';
 }
