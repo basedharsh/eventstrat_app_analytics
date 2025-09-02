@@ -1,8 +1,5 @@
 // lib/constants/analytics_constants.dart
 
-// Events for UPITS Analytics
-
-// Screen names for UPITS Analytics
 class EventScreenName {
   // Main app screens
   static const splash = 'splash_screen';
