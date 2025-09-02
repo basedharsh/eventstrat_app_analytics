@@ -83,11 +83,12 @@ class AnalyticsEventsActionInvoker {
 
       final options = Options(headers: finalHeaders);
 
-      await _dio.post(
+      final response = await _dio.post(
         "$apiEndpoint?sessionId=$sessionId",
         data: formData,
         options: options,
       );
+      log("The response from server: ${response.data}");
 
       await prefs.remove('analytics');
       log('Analytics events synced successfully');
