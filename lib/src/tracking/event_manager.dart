@@ -61,10 +61,6 @@ class EventManager {
         prefs.getString('user_email') ?? _config!.userEmail ?? 'guest';
     final cohort = prefs.getString('cohort') ?? _config!.userCohort ?? 'guest';
 
-    log(
-      "Target Product : $targetProduct,Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
-    );
-
     EventFirebaseDto eventDTO = EventFirebaseDto(
       eventName: eventName,
       email: email,
@@ -76,6 +72,7 @@ class EventManager {
       cohort: cohort,
       version: packageInfo.version,
     );
+    log("The each event data is : ${await eventDTO.toJson(config: _config)}");
 
     await _invoker!.storeEventToLocal(
       eventData: await eventDTO.toJson(config: _config),
