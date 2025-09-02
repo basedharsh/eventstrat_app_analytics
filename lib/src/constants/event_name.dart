@@ -58,6 +58,8 @@ class EventName {
   static const v1SlotBtn = 'v1_slot_btn';
   static const v1BookMeetingBtn = 'v1_book_meeting_btn';
   static const v1UpdateAvailabilityBtn = 'v1_update_availability_btn';
+  static const v1ScheduleMeetingCardTapped = 'v1_schedule_meeting_card_tap';
+  static const v1ScheduleCancelMeetingTapped = 'v1_schedule_cancel_meeting_tap';
 
   // EXHIBITOR PAGE EVENTS
   static const v1ExhibitorScreen = 'v1_exhibitor_screen'; // optional
