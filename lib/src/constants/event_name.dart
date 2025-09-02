@@ -12,18 +12,15 @@ class EventName {
   static const v1AboutIHEBtn = 'v1_about_ihe_btn';
   static const v1EventGlanceBtn = 'v1_event_glance_btn';
   static const v1DirectionBtn = 'v1_direction_btn';
-  static const moreVideosButton = 'more_videos_button';
-  static const eventContactUsTabSelected = 'event_contact_us_tab_selected';
+  static const v1MoreVideosButton = 'v1_more_videos_button';
+  static const v1EventContactUsTabSelected = 'v1_vent_contact_us_tab_selected';
   static const eventResourcesTabSelected = 'event_resources_tab_selected';
   static const homeGetInTouchMoreContactsBtn =
-      'home_get_in_touch_more_contacts_btn';
-  static const homePoweredByEventstrat = 'home_powered_by_eventstrat';
+      'v1_home_get_in_touch_more_contacts_btn';
+  static const homePoweredByEventstrat = 'v1_home_powered_by_eventstrat';
 
   // NETWORKING PAGE EVENTS
   static const v1NetworkingScreen = 'v1_networking_screen';
-  static const v1AttendeeTab = 'v1_attendee_tab';
-  static const v1ScannedContactTab = 'v1_scanned_contact_tab';
-  static const v1BookmarkTab = 'v1_bookmark_tab';
   static const v1RecommendationCard = 'v1_recommendation_card';
   static const v1SearchInput = 'v1_search_input';
   static const v1SearchFilterBtn = 'v1_search_filter_btn';
@@ -32,12 +29,21 @@ class EventName {
   static const v1BuyerBtn = 'v1_buyer_btn';
   static const v1CompanyCard = 'v1_company_card';
   static const v1BookmarkBtn = 'v1_bookmark_btn';
+  static const v1UnbookmarkBtn = 'v1_unbookmark_btn';
+  static const v1LeadCardTapped = 'v1_lead_card_tap';
+  static const v1ClearLeadFiltersTapped = 'v1_clear_lead_filters_tap';
   static const v1CompanyDetailsSheet = 'v1_company_details_bs';
   static const v1CrossBtn = 'v1_cross_btn';
   static const v1MeetingBtn = 'v1_meeting_btn';
   static const v1ViewCompanyDetails = 'v1_view_company_details';
   static const v1NetworkingPhoneNumber = 'v1_networking_phone_number';
   static const v1NetworkingEmailCopy = 'v1_networking_email_copy';
+  static const v1EventAttendeesTabSelected = 'v1_event_attendees_tab_selected';
+  static const v1EventScannedContactsTabSelected =
+      'v1_event_scanned_contacts_tab_selected';
+  static const v1EventBookmarksTabSelected = 'v1_event_bookmarks_tab_selected';
+  static const v1v1NetWorkingCardTap = 'v1_networking_card_tap';
+  static const v1BookmarkedCardTapped = 'v1_bookmarked_card_tap';
 
   // MEETINGS PAGE EVENTS
   static const v1MeetingScreen = 'v1_meeting_screen'; // optional
