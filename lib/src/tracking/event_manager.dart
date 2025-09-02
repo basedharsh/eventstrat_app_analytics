@@ -62,7 +62,7 @@ class EventManager {
     final cohort = prefs.getString('cohort') ?? _config!.userCohort ?? 'guest';
 
     log(
-      "Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
+      "Target Product : $targetProduct,Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
     );
 
     EventFirebaseDto eventDTO = EventFirebaseDto(
