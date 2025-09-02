@@ -82,11 +82,11 @@ class EventManager {
     );
   }
 
-  static Future<void> sync() async {
+  static Future<void> sync({Map<String, String>? headers}) async {
     if (_invoker == null) {
       log('EventManager not initialized');
       return;
     }
-    await _invoker!.syncEventsToDB();
+    await _invoker!.syncEventsToDB(additionalHeaders: headers);
   }
 }

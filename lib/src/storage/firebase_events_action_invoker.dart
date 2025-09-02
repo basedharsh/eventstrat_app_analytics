@@ -41,7 +41,7 @@ class AnalyticsEventsActionInvoker {
     await prefs.setString('analytics', updatedAnalyticsString);
   }
 
-  Future<void> syncEventsToDB() async {
+  Future<void> syncEventsToDB({Map<String, String>? additionalHeaders}) async {
     final prefs = await SharedPreferences.getInstance();
     String sessionId = SessionManager().sessionId;
     String analyticsString = prefs.getString('analytics') ?? '';
@@ -75,7 +75,13 @@ class AnalyticsEventsActionInvoker {
         ),
       });
 
-      final options = Options(headers: headers ?? {});
+      // Merge initialization headers with additional headers
+      final Map<String, String> finalHeaders = {...(headers ?? {})};
+      if (additionalHeaders != null) {
+        finalHeaders.addAll(additionalHeaders);
+      }
+
+      final options = Options(headers: finalHeaders);
 
       await _dio.post(
         "$apiEndpoint?sessionId=$sessionId",

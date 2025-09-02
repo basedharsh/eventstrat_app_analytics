@@ -63,10 +63,10 @@ class EventstratAnalytics {
     );
   }
 
-  static Future<void> sync() async {
+  static Future<void> sync({Map<String, String>? headers}) async {
     if (!_isInitialized) {
       throw StateError('EventstratAnalytics not initialized.');
     }
-    await EventManager.sync();
+    await EventManager.sync(headers: headers);
   }
 }
