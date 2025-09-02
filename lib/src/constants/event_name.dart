@@ -65,6 +65,8 @@ class EventName {
   static const v1ExhibitorScreen = 'v1_exhibitor_screen'; // optional
   static const v1ViewAllBtn = 'v1_view_all_btn';
   static const v1CategoryCard = 'v1_category_card';
+  static const v1ExhibitorCategoryTab = 'v1_exhibitor_category_tab';
+  static const v1AllExhibitorTab = 'v1_all_exhibitor_tab';
 
   // PROFILE PAGE EVENTS
   static const v1AddProfilePhotoBtn = 'v1_add_profile_photo_btn';
