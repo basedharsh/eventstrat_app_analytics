@@ -44,6 +44,8 @@ class EventName {
   static const v1EventBookmarksTabSelected = 'v1_event_bookmarks_tab_selected';
   static const v1v1NetWorkingCardTap = 'v1_networking_card_tap';
   static const v1BookmarkedCardTapped = 'v1_bookmarked_card_tap';
+  static const v1RemoveLeadTapped = 'v1_remove_lead_tap';
+  static const v1SaveContactTapped = 'v1_save_contact_tap';
 
   // MEETINGS PAGE EVENTS
   static const v1MeetingScreen = 'v1_meeting_screen'; // optional
