@@ -1,4 +1,4 @@
-# Eventstrat App Analytics
+# EventStrat App Analytics
 
 A Flutter analytics package for tracking events across multiple applications with configurable backends and device identification strategies.
 
@@ -42,11 +42,11 @@ dependencies:
 dependencies:
   eventstrat_app_analytics:
     git:
-      url: https://github.com/yourcompany/eventstrat_app_analytics.git
+      url: https://github.com/basedharsh/eventstrat_app_analytics.git
       ref: main
 ```
 
-### Option 3: Private Package Server
+### Option 3: pub.dev
 ```yaml
 # pubspec.yaml
 dependencies:
@@ -65,10 +65,10 @@ void main() async {
   
   // Initialize analytics
   EventstratAnalytics.initialize(
-    targetProduct: 'WFI',
-    apiEndpoint: 'https://wfi-api.com/analytics',
+    targetProduct: 'MyApp',
+    apiEndpoint: 'https://api.example.com/analytics',
     userEmail: 'user@email.com',
-    userCohort: 'buyer',
+    userCohort: 'premium_users',
     enableDebugMode: true,
   );
   
@@ -79,20 +79,20 @@ void main() async {
 ### 2. Create Event Constants
 
 ```dart
-// lib/analytics/wfi_events.dart
-class WFIEvents {
+// lib/analytics/app_events.dart
+class AppEvents {
   static const loginAttempted = 'login_attempted';
   static const dashboardViewed = 'dashboard_viewed';
   static const buttonClicked = 'button_clicked';
-  static const workflowCreated = 'workflow_created';
+  static const featureUsed = 'feature_used';
   static const dataExported = 'data_exported';
 }
 
-// lib/analytics/wfi_screens.dart
-class WFIScreens {
+// lib/analytics/app_screens.dart
+class AppScreens {
   static const loginScreen = 'login_screen';
   static const dashboardScreen = 'dashboard_screen';
-  static const workflowScreen = 'workflow_screen';
+  static const settingsScreen = 'settings_screen';
 }
 ```
 
@@ -100,8 +100,8 @@ class WFIScreens {
 
 ```dart
 import 'package:eventstrat_app_analytics/eventstrat_app_analytics.dart';
-import 'analytics/wfi_events.dart';
-import 'analytics/wfi_screens.dart';
+import 'analytics/app_events.dart';
+import 'analytics/app_screens.dart';
 
 class MyWidget extends StatelessWidget {
   @override
@@ -110,8 +110,8 @@ class MyWidget extends StatelessWidget {
       onTap: () {
         // Track button click
         EventstratAnalytics.track(
-          event: WFIEvents.buttonClicked,
-          screen: WFIScreens.dashboardScreen,
+          event: AppEvents.buttonClicked,
+          screen: AppScreens.dashboardScreen,
           action: EventAction.click,
           category: EventCategory.topNav,
           miscellaneous: 'export_data_button',
@@ -135,7 +135,7 @@ EventstratAnalytics.initialize(
   targetProduct: 'YourAppName',           // Required
   apiEndpoint: 'https://your-api.com',    // Required
   userEmail: 'user@email.com',            // Optional
-  userCohort: 'buyer',                    // Optional
+  userCohort: 'premium_users',            // Optional
   enableDebugMode: false,                 // Optional, default false
 );
 ```
@@ -147,7 +147,7 @@ EventstratAnalytics.initialize(
   targetProduct: 'YourAppName',
   apiEndpoint: 'https://your-api.com/analytics',
   userEmail: 'user@email.com',
-  userCohort: 'exhibitor',
+  userCohort: 'beta_users',
   headers: {
     'Authorization': 'Bearer your-token',
     'Content-Type': 'application/json',
@@ -173,8 +173,8 @@ EventstratAnalytics.track(
 #### Detailed Event Tracking
 ```dart
 EventstratAnalytics.track(
-  event: MyAppEvents.featureUsed,
-  screen: MyAppScreens.dashboardScreen,
+  event: AppEvents.featureUsed,
+  screen: AppScreens.dashboardScreen,
   action: EventAction.click,
   category: EventCategory.topNav,
   miscellaneous: 'additional_data',
@@ -187,6 +187,18 @@ EventstratAnalytics.track(
 ```dart
 // Force sync stored events to backend
 await EventstratAnalytics.sync();
+
+// Sync with custom headers
+await EventstratAnalytics.sync(headers: {'Authorization': 'Bearer token'});
+```
+
+### Update User Information
+
+```dart
+await EventstratAnalytics.updateUser(
+  email: 'new@email.com',
+  cohort: 'premium_users',
+);
 ```
 
 ### Using Built-in Constants
@@ -302,7 +314,12 @@ static Future<void> track({
 
 #### `sync()`
 ```dart
-static Future<void> sync()
+static Future<void> sync({Map<String, String>? headers})
+```
+
+#### `updateUser()`
+```dart
+static Future<void> updateUser({String? email, String? cohort})
 ```
 
 ### Constants
@@ -333,11 +350,11 @@ your_projects/
 │   ├── pubspec.yaml
 │   ├── lib/
 │   └── README.md
-├── wfi_app/                      # WFI application
+├── app_one/                      # First application
 │   └── pubspec.yaml
-├── upits_app/                    # UPITS application
+├── app_two/                      # Second application
 │   └── pubspec.yaml
-└── ihe_app/                      # IHE application
+└── app_three/                    # Third application
     └── pubspec.yaml
 ```
 
@@ -353,7 +370,7 @@ Reference specific versions in apps:
 dependencies:
   eventstrat_app_analytics:
     git:
-      url: https://github.com/yourcompany/eventstrat_app_analytics.git
+      url: https://github.com/basedharsh/eventstrat_app_analytics.git
       ref: v1.0.0
 ```
 
@@ -422,49 +439,28 @@ This will output detailed logs showing:
 
 ## Example Apps
 
-### WFI App Integration
+### EventStrat App Integration
 ```dart
 // main.dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   EventstratAnalytics.initialize(
-    targetProduct: 'WFI',
-    apiEndpoint: 'https://wfi-api.com/analytics',
+    targetProduct: 'EventStratApp',
+    apiEndpoint: 'https://eventstrat-api.com/analytics',
     deviceIdStrategy: DeviceIdStrategy.hardwareId,
   );
   
-  runApp(WFIApp());
+  runApp(EventStratApp());
 }
 
-// wfi_events.dart
-class WFIEvents {
-  static const workflowCreated = 'workflow_created';
-  static const dataExported = 'data_exported';
-  static const reportGenerated = 'report_generated';
-}
-```
-
-### UPITS App Integration
-```dart
-// main.dart  
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  EventstratAnalytics.initialize(
-    targetProduct: 'UPITS',
-    apiEndpoint: 'https://upits-api.com/analytics',
-    deviceIdStrategy: DeviceIdStrategy.generated,
-  );
-  
-  runApp(UPITSApp());
-}
-
-// upits_events.dart
-class UPITSEvents {
-  static const courseEnrolled = 'course_enrolled';
-  static const examStarted = 'exam_started';
-  static const certificateDownloaded = 'certificate_downloaded';
+// eventstrat_events.dart
+class EventStratEvents {
+  static const eventCreated = 'event_created';
+  static const eventViewed = 'event_viewed';
+  static const eventRegistered = 'event_registered';
+  static const strategyApplied = 'strategy_applied';
+  static const dashboardOpened = 'dashboard_opened';
 }
 ```
 
