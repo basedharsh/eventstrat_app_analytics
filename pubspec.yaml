@@ -1,20 +1,22 @@
 name: eventstrat_app_analytics
-description: "A Flutter analytics package for tracking events across multiple apps"
+description: A Flutter analytics package for tracking events across multiple applications with configurable backend.
 version: 0.0.1
+homepage: https://github.com/basedharsh/eventstrat_app_analytics
+repository: https://github.com/basedharsh/eventstrat_app_analytics
+documentation: https://github.com/basedharsh/eventstrat_app_analytics#readme
 
 environment:
-  sdk: ^3.7.0
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^4.5.0                    
-  device_info_plus: ^11.3.0       
-  package_info_plus: ^8.0.2       
-  shared_preferences: ^2.2.3      
-  dio: ^5.7.0                     
-  go_router: ^14.8.1              
+  uuid: ^4.5.0
+  device_info_plus: ^11.3.0
+  package_info_plus: ^8.0.2
+  shared_preferences: ^2.2.3
+  dio: ^5.7.0
   path_provider: ^2.1.5
 
 dev_dependencies:
@@ -22,3 +24,15 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+# Topics help users discover your package on pub.dev
+topics:
+  - analytics
+  - tracking
+  - events
+  - flutter
+  - metrics
+
+# Platform support - specify which platforms your package supports
+platforms:
+  android:
+  ios:
