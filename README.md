@@ -463,5 +463,3 @@ class EventStratEvents {
   static const dashboardOpened = 'dashboard_opened';
 }
 ```
-
-This package provides a robust, flexible analytics solution that can be easily integrated across multiple Flutter applications while maintaining consistency and reliability.
