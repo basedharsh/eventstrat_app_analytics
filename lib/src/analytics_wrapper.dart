@@ -13,6 +13,7 @@ class EventstratAnalytics {
     Map<String, String>? headers,
     bool enableDebugMode = false,
     DeviceIdStrategy deviceIdStrategy = DeviceIdStrategy.hardwareId,
+    bool enableFirebase = false,
     String? methodChannelName,
   }) {
     final config = AnalyticsConfig(
@@ -23,6 +24,7 @@ class EventstratAnalytics {
       headers: headers,
       enableDebugMode: enableDebugMode,
       deviceIdStrategy: deviceIdStrategy,
+      enableFirebase: enableFirebase,
       methodChannelName: methodChannelName,
     );
 

@@ -5,6 +5,7 @@ import '../storage/firebase_events_action_invoker.dart';
 import '../tracking/event_firebase_dto.dart';
 import '../tracking/analytics_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'firebase_analytics_service.dart';
 
 class EventManager {
   static AnalyticsConfig? _config;
@@ -16,11 +17,13 @@ class EventManager {
       apiEndpoint: config.apiEndpoint,
       headers: config.headers,
     );
+    //TO ENABLE FIREBASE
+    FirebaseAnalyticsService.initialize(enabled: config.enableFirebase);
   }
 
   static Future<void> updateUser({String? email, String? cohort}) async {
     if (_config == null) {
-      log('EventManager not initialized');
+      log('Analytics: EventManager not initialized');
       return;
     }
 
@@ -29,13 +32,17 @@ class EventManager {
     final prefs = await SharedPreferences.getInstance();
     if (email != null) {
       await prefs.setString('user_email', email);
+      // Set userId in Firebase Analytics
+      await FirebaseAnalyticsService.setUserId(email);
     }
     if (cohort != null) {
       await prefs.setString('user_cohort', cohort);
+      await FirebaseAnalyticsService.setUserProperty(
+          name: 'cohort', value: cohort);
     }
 
     if (_config!.enableDebugMode) {
-      log('User info updated: email=$email, cohort=$cohort');
+      log('Analytics: User info updated: email=$email, cohort=$cohort');
     }
   }
 
@@ -49,7 +56,7 @@ class EventManager {
   }) async {
     if (_config == null || _invoker == null) {
       log(
-        'EventManager not initialized. Call EventManager.initialize() first.',
+        'Analytics: EventManager not initialized. Call EventManager.initialize() first.',
       );
       return;
     }
@@ -59,8 +66,8 @@ class EventManager {
 
     final email =
         prefs.getString('user_email') ?? _config!.userEmail ?? 'guest';
-    final cohort = prefs.getString('cohort') ?? _config!.userCohort ?? 'guest';
-
+    final cohort =
+        prefs.getString('user_cohort') ?? _config!.userCohort ?? 'guest';
     EventFirebaseDto eventDTO = EventFirebaseDto(
       eventName: eventName,
       email: email,
@@ -73,17 +80,26 @@ class EventManager {
       version: packageInfo.version,
     );
     log(
-      "Target Product : ${targetProduct ?? _config!.targetProduct}, Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
+      " Analytics: Target Product : ${targetProduct ?? _config!.targetProduct}, Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
     );
 
     await _invoker!.storeEventToLocal(
       eventData: await eventDTO.toJson(config: _config),
     );
+// Log event to Firebase Analytics
+    await FirebaseAnalyticsService.logEvent(
+      eventName: eventName,
+      screenName: screenName,
+      eventAction: eventAction,
+      eventCategory: eventCategory,
+      email: email,
+      cohort: cohort,
+    );
   }
 
   static Future<void> sync({Map<String, String>? headers}) async {
     if (_invoker == null) {
-      log('EventManager not initialized');
+      log('Analytics: EventManager not initialized');
       return;
     }
     await _invoker!.syncEventsToDB(additionalHeaders: headers);

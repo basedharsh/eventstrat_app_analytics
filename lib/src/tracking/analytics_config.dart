@@ -9,6 +9,7 @@ class AnalyticsConfig {
   final bool enableDebugMode;
   final DeviceIdStrategy deviceIdStrategy;
   final String? methodChannelName;
+  final bool enableFirebase;
 
   const AnalyticsConfig({
     required this.targetProduct,
@@ -19,6 +20,7 @@ class AnalyticsConfig {
     this.enableDebugMode = false,
     this.deviceIdStrategy = DeviceIdStrategy.hardwareId,
     this.methodChannelName,
+    this.enableFirebase = false,
   });
 
   AnalyticsConfig copyWith({
@@ -30,6 +32,7 @@ class AnalyticsConfig {
     bool? enableDebugMode,
     DeviceIdStrategy? deviceIdStrategy,
     String? methodChannelName,
+    bool? enableFirebase,
   }) {
     return AnalyticsConfig(
       targetProduct: targetProduct ?? this.targetProduct,
@@ -40,6 +43,7 @@ class AnalyticsConfig {
       enableDebugMode: enableDebugMode ?? this.enableDebugMode,
       deviceIdStrategy: deviceIdStrategy ?? this.deviceIdStrategy,
       methodChannelName: methodChannelName ?? this.methodChannelName,
+      enableFirebase: enableFirebase ?? this.enableFirebase,
     );
   }
 }

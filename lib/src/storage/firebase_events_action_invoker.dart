@@ -27,10 +27,9 @@ class AnalyticsEventsActionInvoker {
     if (analyticsString.isNotEmpty) {
       try {
         final decodedJson = jsonDecode(analyticsString);
-        decodedEvents =
-            (decodedJson as List)
-                .map((e) => e as Map<String, dynamic>)
-                .toList();
+        decodedEvents = (decodedJson as List)
+            .map((e) => e as Map<String, dynamic>)
+            .toList();
       } catch (e) {
         decodedEvents = [];
       }
@@ -47,7 +46,7 @@ class AnalyticsEventsActionInvoker {
     String analyticsString = prefs.getString('analytics') ?? '';
 
     if (analyticsString.isEmpty) {
-      log('No events to sync');
+      log('Analytics:No events to sync');
       return;
     }
 
@@ -57,7 +56,7 @@ class AnalyticsEventsActionInvoker {
       decodedEvents =
           (decodedJson as List).map((e) => e as Map<String, dynamic>).toList();
     } catch (e) {
-      log('Failed to decode analytics events: ${e.toString()}');
+      log('Analytics: Failed to decode analytics events: ${e.toString()}');
       return;
     }
 
@@ -88,12 +87,12 @@ class AnalyticsEventsActionInvoker {
         data: formData,
         options: options,
       );
-      log("The response from server: ${response.data}");
+      log("Analytics: The response from server: ${response.data}");
 
       await prefs.remove('analytics');
-      log('Analytics events synced successfully');
+      log('Analytics: events synced successfully');
     } catch (e) {
-      log('Upload failed: ${e.toString()}');
+      log('Analytics: Upload failed: ${e.toString()}');
     } finally {
       final tempDir = await getTemporaryDirectory();
       final filePath = "${tempDir.path}/analytics_events.json";
