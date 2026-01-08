@@ -99,13 +99,24 @@ class AnalyticsEventsActionInvoker {
           log('ANALYTICS: [INFO] Created temporary file for upload: $filePath');
         }
 
-        final formData = FormData.fromMap({
-          'data': jsonEncode({'sessionId': sessionId}),
-          'file': await MultipartFile.fromFile(
+        // --form 'data="{\"sessionId\":\"session123\"}";type=application/json'
+        // --form 'file=@"/path/to/file"'
+        final formData = FormData();
+
+        // Add data field with JSON content
+        formData.fields.add(MapEntry(
+          'data',
+          jsonEncode({'sessionId': sessionId}),
+        ));
+
+        // Add file field
+        formData.files.add(MapEntry(
+          'file',
+          await MultipartFile.fromFile(
             file.path,
             filename: 'analytics_events.json',
           ),
-        });
+        ));
 
         // Merge initialization headers with additional headers
         final Map<String, String> finalHeaders = {...(headers ?? {})};
