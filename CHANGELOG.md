@@ -1,3 +1,6 @@
+## 0.0.6
+* api call format change
+
 ## 0.0.5
 
 * **Unified Log Prefix**: Added `ANALYTICS:` prefix to all log messages for consistent identification
