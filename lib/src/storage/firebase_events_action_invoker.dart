@@ -36,7 +36,7 @@ class AnalyticsEventsActionInvoker {
               .toList();
         } catch (e) {
           if (config?.enableDebugMode ?? false) {
-            log('Analytics: [WARNING] Failed to decode existing events, starting fresh: ${e.toString()}');
+            log('ANALYTICS: [WARNING] Failed to decode existing events, starting fresh: ${e.toString()}');
           }
           decodedEvents = [];
         }
@@ -47,11 +47,11 @@ class AnalyticsEventsActionInvoker {
       await prefs.setString('analytics', updatedAnalyticsString);
 
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [SUCCESS] Event stored locally. Total events in queue: ${decodedEvents.length}');
+        log('ANALYTICS: [SUCCESS] Event stored locally. Total events in queue: ${decodedEvents.length}');
       }
     } catch (e) {
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [ERROR] Failed to store event locally: ${e.toString()}');
+        log('ANALYTICS: [ERROR] Failed to store event locally: ${e.toString()}');
       }
     }
   }
@@ -64,13 +64,13 @@ class AnalyticsEventsActionInvoker {
 
       if (analyticsString.isEmpty) {
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [INFO] No events to sync. Queue is empty.');
+          log('ANALYTICS: [INFO] No events to sync. Queue is empty.');
         }
         return;
       }
 
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [INFO] Starting sync process. SessionId: $sessionId');
+        log('ANALYTICS: [INFO] Starting sync process. SessionId: $sessionId');
       }
 
       List<Map<String, dynamic>> decodedEvents = [];
@@ -80,11 +80,11 @@ class AnalyticsEventsActionInvoker {
             .map((e) => e as Map<String, dynamic>)
             .toList();
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [INFO] Decoded ${decodedEvents.length} events from storage');
+          log('ANALYTICS: [INFO] Decoded ${decodedEvents.length} events from storage');
         }
       } catch (e) {
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [ERROR] Failed to decode analytics events: ${e.toString()}');
+          log('ANALYTICS: [ERROR] Failed to decode analytics events: ${e.toString()}');
         }
         return;
       }
@@ -96,7 +96,7 @@ class AnalyticsEventsActionInvoker {
             await File(filePath).writeAsString(jsonEncode(decodedEvents));
 
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [INFO] Created temporary file for upload: $filePath');
+          log('ANALYTICS: [INFO] Created temporary file for upload: $filePath');
         }
 
         final formData = FormData.fromMap({
@@ -114,7 +114,7 @@ class AnalyticsEventsActionInvoker {
         }
 
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [INFO] Sending ${decodedEvents.length} events to $apiEndpoint');
+          log('ANALYTICS: [INFO] Sending ${decodedEvents.length} events to $apiEndpoint');
         }
 
         final options = Options(headers: finalHeaders);
@@ -126,20 +126,20 @@ class AnalyticsEventsActionInvoker {
         );
 
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [SUCCESS] Server response received. Status code: ${response.statusCode}');
-          log('Analytics: [INFO] Server response data: ${response.data}');
+          log('ANALYTICS: [SUCCESS] Server response received. Status code: ${response.statusCode}');
+          log('ANALYTICS: [INFO] Server response data: ${response.data}');
         }
 
         await prefs.remove('analytics');
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [SUCCESS] Events synced successfully and cleared from local storage');
+          log('ANALYTICS: [SUCCESS] Events synced with backend successfully');
         }
       } catch (e) {
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [ERROR] Upload failed: ${e.toString()}');
+          log('ANALYTICS: [ERROR] Upload failed: ${e.toString()}');
           if (e is DioException) {
-            log('Analytics: [ERROR] Dio error type: ${e.type}, Response status: ${e.response?.statusCode}');
-            log('Analytics: [ERROR] Response body: ${e.response?.data}');
+            log('ANALYTICS: [ERROR] Dio error type: ${e.type}, Response status: ${e.response?.statusCode}');
+            log('ANALYTICS: [ERROR] Response body: ${e.response?.data}');
           }
         }
       } finally {
@@ -150,18 +150,18 @@ class AnalyticsEventsActionInvoker {
           if (await file.exists()) {
             await file.delete();
             if (config?.enableDebugMode ?? false) {
-              log('Analytics: [INFO] Temporary file cleaned up');
+              log('ANALYTICS: [INFO] Temporary file cleaned up');
             }
           }
         } catch (e) {
           if (config?.enableDebugMode ?? false) {
-            log('Analytics: [WARNING] Failed to cleanup temporary file: ${e.toString()}');
+            log('ANALYTICS: [WARNING] Failed to cleanup temporary file: ${e.toString()}');
           }
         }
       }
     } catch (e) {
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [ERROR] Unexpected error in syncEventsToDB: ${e.toString()}');
+        log('ANALYTICS: [ERROR] Unexpected error in syncEventsToDB: ${e.toString()}');
       }
     }
   }

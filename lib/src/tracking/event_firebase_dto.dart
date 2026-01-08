@@ -58,7 +58,7 @@ class EventFirebaseDto {
           rawDeviceId = androidInfo.id;
           deviceModel = androidInfo.model;
           if (config?.enableDebugMode ?? false) {
-            log('Analytics: [INFO] Android device info - ID: $rawDeviceId, Model: $deviceModel');
+            log('ANALYTICS: [INFO] Android device info - ID: $rawDeviceId, Model: $deviceModel');
           }
         } else if (Platform.isIOS) {
           final uuid = await DeviceUUID.getDeviceUUID(config: config);
@@ -70,12 +70,12 @@ class EventFirebaseDto {
           }
           deviceModel = (await deviceInfo.iosInfo).utsname.machine;
           if (config?.enableDebugMode ?? false) {
-            log('Analytics: [INFO] iOS device info - ID: $rawDeviceId, Model: $deviceModel');
+            log('ANALYTICS: [INFO] iOS device info - ID: $rawDeviceId, Model: $deviceModel');
           }
         }
       } catch (e) {
         if (config?.enableDebugMode ?? false) {
-          log('Analytics: [ERROR] Failed to get device info: ${e.toString()}');
+          log('ANALYTICS: [ERROR] Failed to get device info: ${e.toString()}');
         }
         rawDeviceId = 'unknown';
         deviceModel = 'unknown';
@@ -86,13 +86,13 @@ class EventFirebaseDto {
       data["platform"] = Platform.isAndroid ? 'android' : 'ios';
 
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [SUCCESS] Event DTO created: ${data.toString()}');
+        log('ANALYTICS: [SUCCESS] Event DTO created: ${data.toString()}');
       }
 
       return data;
     } catch (e) {
       if (config?.enableDebugMode ?? false) {
-        log('Analytics: [ERROR] Failed to convert event to JSON: ${e.toString()}');
+        log('ANALYTICS: [ERROR] Failed to convert event to JSON: ${e.toString()}');
       }
       rethrow;
     }

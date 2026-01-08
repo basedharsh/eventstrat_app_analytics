@@ -1,3 +1,10 @@
+## 0.0.5
+
+* **Unified Log Prefix**: Added `ANALYTICS:` prefix to all log messages for consistent identification
+* **Improved Backend Sync Messaging**: Changed sync success message to "Events synced with backend successfully" for clarity
+* **Better Log Readability**: Standardized log format across all components
+* **Production-Ready**: All logs properly prefixed and labeled for easy filtering in log aggregation systems
+
 ## 0.0.4
 
 * **Comprehensive Debug Logging**: Added detailed debug logging throughout the package (only shows when `enableDebugMode: true`)

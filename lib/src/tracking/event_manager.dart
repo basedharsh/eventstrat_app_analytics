@@ -27,7 +27,7 @@ class EventManager {
   static Future<void> updateUser({String? email, String? cohort}) async {
     if (_config == null) {
       if (_config?.enableDebugMode ?? false) {
-        log('Analytics: [ERROR] EventManager not initialized. Cannot update user info.');
+        log('ANALYTICS: [ERROR] EventManager not initialized. Cannot update user info.');
       }
       return;
     }
@@ -40,13 +40,13 @@ class EventManager {
         try {
           await prefs.setString('user_email', email);
           if (_config!.enableDebugMode) {
-            log('Analytics: [SUCCESS] Email saved to preferences: $email');
+            log('ANALYTICS: [SUCCESS] Email saved to preferences: $email');
           }
           // Set userId in Firebase Analytics
           await FirebaseAnalyticsService.setUserId(email);
         } catch (e) {
           if (_config!.enableDebugMode) {
-            log('Analytics: [ERROR] Failed to save email to preferences: ${e.toString()}');
+            log('ANALYTICS: [ERROR] Failed to save email to preferences: ${e.toString()}');
           }
         }
       }
@@ -54,23 +54,23 @@ class EventManager {
         try {
           await prefs.setString('user_cohort', cohort);
           if (_config!.enableDebugMode) {
-            log('Analytics: [SUCCESS] Cohort saved to preferences: $cohort');
+            log('ANALYTICS: [SUCCESS] Cohort saved to preferences: $cohort');
           }
           await FirebaseAnalyticsService.setUserProperty(
               name: 'cohort', value: cohort);
         } catch (e) {
           if (_config!.enableDebugMode) {
-            log('Analytics: [ERROR] Failed to save cohort to preferences: ${e.toString()}');
+            log('ANALYTICS: [ERROR] Failed to save cohort to preferences: ${e.toString()}');
           }
         }
       }
 
       if (_config!.enableDebugMode) {
-        log('Analytics: [SUCCESS] User info updated: email=$email, cohort=$cohort');
+        log('ANALYTICS: [SUCCESS] User info updated: email=$email, cohort=$cohort');
       }
     } catch (e) {
       if (_config!.enableDebugMode) {
-        log('Analytics: [ERROR] Unexpected error in updateUser: ${e.toString()}');
+        log('ANALYTICS: [ERROR] Unexpected error in updateUser: ${e.toString()}');
       }
     }
   }
@@ -86,7 +86,7 @@ class EventManager {
     if (_config == null || _invoker == null) {
       if (_config?.enableDebugMode ?? false) {
         log(
-          'Analytics: [ERROR] EventManager not initialized. Call EventManager.initialize() first.',
+          'ANALYTICS: [ERROR] EventManager not initialized. Call EventManager.initialize() first.',
         );
       }
       return;
@@ -115,7 +115,7 @@ class EventManager {
 
       if (_config!.enableDebugMode) {
         log(
-          " Analytics: [INFO] Target Product : ${targetProduct ?? _config!.targetProduct}, Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
+          " ANALYTICS: [INFO] Target Product : ${targetProduct ?? _config!.targetProduct}, Sending event: $eventName, Screen: $screenName, Action: $eventAction, Category: $eventCategory, Email: $email, Cohort: $cohort, Version: ${packageInfo.version}, Miscellaneous: $miscellaneous",
         );
       }
 
@@ -124,7 +124,7 @@ class EventManager {
       );
 
       if (_config!.enableDebugMode) {
-        log('Analytics: [SUCCESS] Event stored locally: $eventName');
+        log('ANALYTICS: [SUCCESS] Event stored locally: $eventName');
       }
 
       // Log event to Firebase Analytics
@@ -138,7 +138,7 @@ class EventManager {
       );
     } catch (e) {
       if (_config!.enableDebugMode) {
-        log('Analytics: [ERROR] Error in sendEventFirebase - Event: $eventName, Error: ${e.toString()}');
+        log('ANALYTICS: [ERROR] Error in sendEventFirebase - Event: $eventName, Error: ${e.toString()}');
       }
     }
   }
@@ -146,7 +146,7 @@ class EventManager {
   static Future<void> sync({Map<String, String>? headers}) async {
     if (_invoker == null) {
       if (_config?.enableDebugMode ?? false) {
-        log('Analytics: EventManager not initialized');
+        log('ANALYTICS: [ERROR] EventManager not initialized');
       }
       return;
     }

@@ -1,6 +1,6 @@
 name: eventstrat_app_analytics
 description: A Flutter analytics package for tracking events across multiple applications with configurable backend.
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/basedharsh/eventstrat_app_analytics
 repository: https://github.com/basedharsh/eventstrat_app_analytics
 documentation: https://github.com/basedharsh/eventstrat_app_analytics#readme
