@@ -4,12 +4,17 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 class FirebaseAnalyticsService {
   static FirebaseAnalytics? _analytics;
   static bool _isEnabled = false;
+  static bool _enableDebugMode = false;
 
-  static void initialize({required bool enabled}) {
+  static void initialize(
+      {required bool enabled, bool enableDebugMode = false}) {
     _isEnabled = enabled;
+    _enableDebugMode = enableDebugMode;
     if (_isEnabled) {
       _analytics = FirebaseAnalytics.instance;
-      log('Analytics: Firebase Analytics initialized');
+      if (_enableDebugMode) {
+        log('Analytics: Firebase Analytics initialized');
+      }
     }
   }
 
@@ -21,7 +26,12 @@ class FirebaseAnalyticsService {
     String? email,
     String? cohort,
   }) async {
-    if (!_isEnabled || _analytics == null) return;
+    if (!_isEnabled || _analytics == null) {
+      if (_enableDebugMode) {
+        log('Analytics: [WARNING] Firebase Analytics not enabled or not initialized');
+      }
+      return;
+    }
 
     try {
       String firebaseEventName = eventName.toLowerCase();
@@ -37,20 +47,33 @@ class FirebaseAnalyticsService {
         },
       );
 
-      log('Analytics: Firebase event logged: $firebaseEventName');
+      if (_enableDebugMode) {
+        log('Analytics: [SUCCESS] Firebase event logged: $firebaseEventName with parameters - screen: $screenName, action: $eventAction, category: $eventCategory, email: $email, cohort: $cohort');
+      }
     } catch (e) {
-      log('Analytics: Firebase error: $e');
+      if (_enableDebugMode) {
+        log('Analytics: [ERROR] Firebase logEvent failed for event: $eventName, Error: ${e.toString()}');
+      }
     }
   }
 
   static Future<void> setUserId(String userId) async {
-    if (!_isEnabled || _analytics == null) return;
+    if (!_isEnabled || _analytics == null) {
+      if (_enableDebugMode) {
+        log('Analytics: [WARNING] Firebase Analytics not enabled or not initialized, cannot set userId: $userId');
+      }
+      return;
+    }
 
     try {
       await _analytics!.setUserId(id: userId);
-      log('Firebase userId set: $userId');
+      if (_enableDebugMode) {
+        log('Analytics: [SUCCESS] Firebase userId set successfully: $userId');
+      }
     } catch (e) {
-      log('Firebase setUserId error: $e');
+      if (_enableDebugMode) {
+        log('Analytics: [ERROR] Firebase setUserId failed for userId: $userId, Error: ${e.toString()}');
+      }
     }
   }
 
@@ -58,13 +81,22 @@ class FirebaseAnalyticsService {
     required String name,
     required String value,
   }) async {
-    if (!_isEnabled || _analytics == null) return;
+    if (!_isEnabled || _analytics == null) {
+      if (_enableDebugMode) {
+        log('Analytics: [WARNING] Firebase Analytics not enabled or not initialized, cannot set user property: $name=$value');
+      }
+      return;
+    }
 
     try {
       await _analytics!.setUserProperty(name: name, value: value);
-      log('Firebase user property set: $name = $value');
+      if (_enableDebugMode) {
+        log('Analytics: [SUCCESS] Firebase user property set successfully: $name = $value');
+      }
     } catch (e) {
-      log('Firebase setUserProperty error: $e');
+      if (_enableDebugMode) {
+        log('Analytics: [ERROR] Firebase setUserProperty failed for property: $name=$value, Error: ${e.toString()}');
+      }
     }
   }
 }

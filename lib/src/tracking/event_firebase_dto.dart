@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:developer';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:eventstrat_app_analytics/src/constants/event_actions.dart';
 import 'package:eventstrat_app_analytics/src/tracking/analytics_config.dart';
@@ -31,41 +32,69 @@ class EventFirebaseDto {
   });
 
   Future<Map<String, dynamic>> toJson({AnalyticsConfig? config}) async {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = getUUID();
-    data['event_name'] = eventName;
-    data['email'] = email;
-    data['event_action'] = eventAction;
-    data['event_category'] = eventCategory;
-    data['screen_name'] = screenName;
-    data['cohort'] = cohort;
-    data['version'] = version ?? 'unknown';
+    try {
+      final Map<String, dynamic> data = <String, dynamic>{};
+      data['id'] = getUUID();
+      data['event_name'] = eventName;
+      data['email'] = email;
+      data['event_action'] = eventAction;
+      data['event_category'] = eventCategory;
+      data['screen_name'] = screenName;
+      data['cohort'] = cohort;
+      data['version'] = version ?? 'unknown';
 
-    data['ref_id'] = refId;
-    data['miscellaneous'] = miscellaneous;
-    data['target_product'] = targetProduct;
-    data["event_timestamp"] = DateTime.now().toString();
+      data['ref_id'] = refId;
+      data['miscellaneous'] = miscellaneous;
+      data['target_product'] = targetProduct;
+      data["event_timestamp"] = DateTime.now().toString();
 
-    String rawDeviceId = '';
-    String deviceModel = '';
-    final deviceInfo = DeviceInfoPlugin();
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      rawDeviceId = androidInfo.id;
-      deviceModel = androidInfo.model;
-    } else if (Platform.isIOS) {
-      final uuid = await DeviceUUID.getDeviceUUID(config: config);
-      if (uuid.isNotEmpty) {
-        rawDeviceId = uuid;
-      } else {
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        rawDeviceId = iosInfo.identifierForVendor ?? '';
+      String rawDeviceId = '';
+      String deviceModel = '';
+
+      try {
+        final deviceInfo = DeviceInfoPlugin();
+        if (Platform.isAndroid) {
+          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          rawDeviceId = androidInfo.id;
+          deviceModel = androidInfo.model;
+          if (config?.enableDebugMode ?? false) {
+            log('Analytics: [INFO] Android device info - ID: $rawDeviceId, Model: $deviceModel');
+          }
+        } else if (Platform.isIOS) {
+          final uuid = await DeviceUUID.getDeviceUUID(config: config);
+          if (uuid.isNotEmpty) {
+            rawDeviceId = uuid;
+          } else {
+            IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+            rawDeviceId = iosInfo.identifierForVendor ?? '';
+          }
+          deviceModel = (await deviceInfo.iosInfo).utsname.machine;
+          if (config?.enableDebugMode ?? false) {
+            log('Analytics: [INFO] iOS device info - ID: $rawDeviceId, Model: $deviceModel');
+          }
+        }
+      } catch (e) {
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [ERROR] Failed to get device info: ${e.toString()}');
+        }
+        rawDeviceId = 'unknown';
+        deviceModel = 'unknown';
       }
-      deviceModel = (await deviceInfo.iosInfo).utsname.machine;
+
+      data["device_id"] = rawDeviceId;
+      data["device_model"] = deviceModel;
+      data["platform"] = Platform.isAndroid ? 'android' : 'ios';
+
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [SUCCESS] Event DTO created: ${data.toString()}');
+      }
+
+      return data;
+    } catch (e) {
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [ERROR] Failed to convert event to JSON: ${e.toString()}');
+      }
+      rethrow;
     }
-    data["device_id"] = rawDeviceId;
-    data["device_model"] = deviceModel;
-    data["platform"] = Platform.isAndroid ? 'android' : 'ios';
-    return data;
   }
 }

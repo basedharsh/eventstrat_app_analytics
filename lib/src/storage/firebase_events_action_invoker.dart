@@ -4,101 +4,164 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../session/session_manager.dart';
+import '../tracking/analytics_config.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AnalyticsEventsActionInvoker {
   final String apiEndpoint;
   final Map<String, String>? headers;
   final Dio _dio;
+  final AnalyticsConfig? config;
 
   AnalyticsEventsActionInvoker({
     required this.apiEndpoint,
     this.headers,
     Dio? dio,
+    this.config,
   }) : _dio = dio ?? Dio();
 
   Future<void> storeEventToLocal({
     required Map<String, dynamic> eventData,
   }) async {
-    final prefs = await SharedPreferences.getInstance();
-    String analyticsString = prefs.getString('analytics') ?? '';
-    List<Map<String, dynamic>> decodedEvents = [];
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String analyticsString = prefs.getString('analytics') ?? '';
+      List<Map<String, dynamic>> decodedEvents = [];
 
-    if (analyticsString.isNotEmpty) {
+      if (analyticsString.isNotEmpty) {
+        try {
+          final decodedJson = jsonDecode(analyticsString);
+          decodedEvents = (decodedJson as List)
+              .map((e) => e as Map<String, dynamic>)
+              .toList();
+        } catch (e) {
+          if (config?.enableDebugMode ?? false) {
+            log('Analytics: [WARNING] Failed to decode existing events, starting fresh: ${e.toString()}');
+          }
+          decodedEvents = [];
+        }
+      }
+
+      decodedEvents.add(eventData);
+      String updatedAnalyticsString = jsonEncode(decodedEvents);
+      await prefs.setString('analytics', updatedAnalyticsString);
+
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [SUCCESS] Event stored locally. Total events in queue: ${decodedEvents.length}');
+      }
+    } catch (e) {
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [ERROR] Failed to store event locally: ${e.toString()}');
+      }
+    }
+  }
+
+  Future<void> syncEventsToDB({Map<String, String>? additionalHeaders}) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      String sessionId = SessionManager().sessionId;
+      String analyticsString = prefs.getString('analytics') ?? '';
+
+      if (analyticsString.isEmpty) {
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [INFO] No events to sync. Queue is empty.');
+        }
+        return;
+      }
+
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [INFO] Starting sync process. SessionId: $sessionId');
+      }
+
+      List<Map<String, dynamic>> decodedEvents = [];
       try {
         final decodedJson = jsonDecode(analyticsString);
         decodedEvents = (decodedJson as List)
             .map((e) => e as Map<String, dynamic>)
             .toList();
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [INFO] Decoded ${decodedEvents.length} events from storage');
+        }
       } catch (e) {
-        decodedEvents = [];
-      }
-    }
-
-    decodedEvents.add(eventData);
-    String updatedAnalyticsString = jsonEncode(decodedEvents);
-    await prefs.setString('analytics', updatedAnalyticsString);
-  }
-
-  Future<void> syncEventsToDB({Map<String, String>? additionalHeaders}) async {
-    final prefs = await SharedPreferences.getInstance();
-    String sessionId = SessionManager().sessionId;
-    String analyticsString = prefs.getString('analytics') ?? '';
-
-    if (analyticsString.isEmpty) {
-      log('Analytics:No events to sync');
-      return;
-    }
-
-    List<Map<String, dynamic>> decodedEvents = [];
-    try {
-      final decodedJson = jsonDecode(analyticsString);
-      decodedEvents =
-          (decodedJson as List).map((e) => e as Map<String, dynamic>).toList();
-    } catch (e) {
-      log('Analytics: Failed to decode analytics events: ${e.toString()}');
-      return;
-    }
-
-    try {
-      final tempDir = await getTemporaryDirectory();
-      final filePath = "${tempDir.path}/analytics_events.json";
-      final file = await File(
-        filePath,
-      ).writeAsString(jsonEncode(decodedEvents));
-
-      final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(
-          file.path,
-          filename: 'analytics_events.json',
-        ),
-      });
-
-      // Merge initialization headers with additional headers
-      final Map<String, String> finalHeaders = {...(headers ?? {})};
-      if (additionalHeaders != null) {
-        finalHeaders.addAll(additionalHeaders);
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [ERROR] Failed to decode analytics events: ${e.toString()}');
+        }
+        return;
       }
 
-      final options = Options(headers: finalHeaders);
+      try {
+        final tempDir = await getTemporaryDirectory();
+        final filePath = "${tempDir.path}/analytics_events.json";
+        final file =
+            await File(filePath).writeAsString(jsonEncode(decodedEvents));
 
-      final response = await _dio.post(
-        "$apiEndpoint?sessionId=$sessionId",
-        data: formData,
-        options: options,
-      );
-      log("Analytics: The response from server: ${response.data}");
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [INFO] Created temporary file for upload: $filePath');
+        }
 
-      await prefs.remove('analytics');
-      log('Analytics: events synced successfully');
+        final formData = FormData.fromMap({
+          'data': jsonEncode({'sessionId': sessionId}),
+          'file': await MultipartFile.fromFile(
+            file.path,
+            filename: 'analytics_events.json',
+          ),
+        });
+
+        // Merge initialization headers with additional headers
+        final Map<String, String> finalHeaders = {...(headers ?? {})};
+        if (additionalHeaders != null) {
+          finalHeaders.addAll(additionalHeaders);
+        }
+
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [INFO] Sending ${decodedEvents.length} events to $apiEndpoint');
+        }
+
+        final options = Options(headers: finalHeaders);
+
+        final response = await _dio.post(
+          apiEndpoint,
+          data: formData,
+          options: options,
+        );
+
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [SUCCESS] Server response received. Status code: ${response.statusCode}');
+          log('Analytics: [INFO] Server response data: ${response.data}');
+        }
+
+        await prefs.remove('analytics');
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [SUCCESS] Events synced successfully and cleared from local storage');
+        }
+      } catch (e) {
+        if (config?.enableDebugMode ?? false) {
+          log('Analytics: [ERROR] Upload failed: ${e.toString()}');
+          if (e is DioException) {
+            log('Analytics: [ERROR] Dio error type: ${e.type}, Response status: ${e.response?.statusCode}');
+            log('Analytics: [ERROR] Response body: ${e.response?.data}');
+          }
+        }
+      } finally {
+        try {
+          final tempDir = await getTemporaryDirectory();
+          final filePath = "${tempDir.path}/analytics_events.json";
+          final file = File(filePath);
+          if (await file.exists()) {
+            await file.delete();
+            if (config?.enableDebugMode ?? false) {
+              log('Analytics: [INFO] Temporary file cleaned up');
+            }
+          }
+        } catch (e) {
+          if (config?.enableDebugMode ?? false) {
+            log('Analytics: [WARNING] Failed to cleanup temporary file: ${e.toString()}');
+          }
+        }
+      }
     } catch (e) {
-      log('Analytics: Upload failed: ${e.toString()}');
-    } finally {
-      final tempDir = await getTemporaryDirectory();
-      final filePath = "${tempDir.path}/analytics_events.json";
-      final file = File(filePath);
-      if (await file.exists()) {
-        await file.delete();
+      if (config?.enableDebugMode ?? false) {
+        log('Analytics: [ERROR] Unexpected error in syncEventsToDB: ${e.toString()}');
       }
     }
   }
