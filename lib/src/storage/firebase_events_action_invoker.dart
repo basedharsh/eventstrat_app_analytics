@@ -92,8 +92,8 @@ class AnalyticsEventsActionInvoker {
       try {
         final tempDir = await getTemporaryDirectory();
         final filePath = "${tempDir.path}/analytics_events.json";
-        final file =
-            await File(filePath).writeAsString(jsonEncode(decodedEvents));
+        final file = File(filePath);
+        await file.writeAsString(jsonEncode(decodedEvents));
 
         if (config?.enableDebugMode ?? false) {
           log('ANALYTICS: [INFO] Created temporary file for upload: $filePath');
@@ -103,18 +103,23 @@ class AnalyticsEventsActionInvoker {
         // --form 'file=@"/path/to/file"'
         final formData = FormData();
 
-        // Add data field with JSON content
-        formData.fields.add(MapEntry(
+        final dataJson = jsonEncode({'sessionId': sessionId});
+        formData.files.add(MapEntry(
           'data',
-          jsonEncode({'sessionId': sessionId}),
+          MultipartFile.fromString(
+            dataJson,
+            filename: 'data',
+            contentType: DioMediaType.parse('application/json'),
+          ),
         ));
 
-        // Add file field
+        // Add file field with proper content type
         formData.files.add(MapEntry(
           'file',
           await MultipartFile.fromFile(
             file.path,
             filename: 'analytics_events.json',
+            contentType: DioMediaType.parse('application/json'),
           ),
         ));
 
@@ -126,6 +131,24 @@ class AnalyticsEventsActionInvoker {
 
         if (config?.enableDebugMode ?? false) {
           log('ANALYTICS: [INFO] Sending ${decodedEvents.length} events to $apiEndpoint');
+          log('ANALYTICS: [DEBUG] ========== SYNC REQUEST DETAILS START ==========');
+          log('ANALYTICS: [DEBUG] File Path: ${file.path}');
+          log('ANALYTICS: [DEBUG] File exists: ${await file.exists()}');
+          log('ANALYTICS: [DEBUG] File size: ${await file.length()} bytes');
+          log('ANALYTICS: [DEBUG] File name: analytics_events.json');
+          log('ANALYTICS: [DEBUG] Content Type: application/json');
+          log('ANALYTICS: [DEBUG] Session ID: $sessionId');
+          log('ANALYTICS: [DEBUG] API Endpoint: $apiEndpoint');
+          log('ANALYTICS: [DEBUG] Total Events: ${decodedEvents.length}');
+          log('ANALYTICS: [DEBUG] Request Headers: $finalHeaders');
+          log('ANALYTICS: [DEBUG] Additional Headers: $additionalHeaders');
+          log('ANALYTICS: [DEBUG] Form Data Fields Count: ${formData.fields.length}');
+          log('ANALYTICS: [DEBUG] Form Data Files Count: ${formData.files.length}');
+          log('ANALYTICS: [DEBUG] Data Field Value: ${jsonEncode({
+                'sessionId': sessionId
+              })}');
+          log('ANALYTICS: [DEBUG] Events Payload: ${jsonEncode(decodedEvents)}');
+          log('ANALYTICS: [DEBUG] ========== SYNC REQUEST DETAILS END ==========');
         }
 
         final options = Options(headers: finalHeaders);
