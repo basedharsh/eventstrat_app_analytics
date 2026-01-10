@@ -1,11 +1,13 @@
 import 'dart:developer';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:eventstrat_app_analytics/src/utils/encryption_helper.dart';
+
 import '../constants/event_actions.dart';
 import '../storage/firebase_events_action_invoker.dart';
 import '../tracking/event_firebase_dto.dart';
 import '../tracking/analytics_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'firebase_analytics_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class EventManager {
   static AnalyticsConfig? _config;
@@ -13,6 +15,7 @@ class EventManager {
 
   static void initialize(AnalyticsConfig config) {
     _config = config;
+    EncryptionHelper.initialize(config.encryptionKey);
     _invoker = AnalyticsEventsActionInvoker(
       apiEndpoint: config.apiEndpoint,
       headers: config.headers,
@@ -35,14 +38,15 @@ class EventManager {
     try {
       _config = _config!.copyWith(userEmail: email, userCohort: cohort);
 
-      final prefs = await SharedPreferences.getInstance();
+      const secureStorage = FlutterSecureStorage();
+
       if (email != null) {
         try {
-          await prefs.setString('user_email', email);
+          await secureStorage.write(key: 'user_email', value: email);
           if (_config!.enableDebugMode) {
             log('ANALYTICS: [SUCCESS] Email saved to preferences: $email');
           }
-          // Set userId in Firebase Analytics
+
           await FirebaseAnalyticsService.setUserId(email);
         } catch (e) {
           if (_config!.enableDebugMode) {
@@ -52,7 +56,7 @@ class EventManager {
       }
       if (cohort != null) {
         try {
-          await prefs.setString('user_cohort', cohort);
+          await secureStorage.write(key: 'user_cohort', value: cohort);
           if (_config!.enableDebugMode) {
             log('ANALYTICS: [SUCCESS] Cohort saved to preferences: $cohort');
           }
@@ -93,13 +97,15 @@ class EventManager {
     }
 
     try {
-      final prefs = await SharedPreferences.getInstance();
+      const secureStorage = FlutterSecureStorage();
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-      final email =
-          prefs.getString('user_email') ?? _config!.userEmail ?? 'guest';
-      final cohort =
-          prefs.getString('user_cohort') ?? _config!.userCohort ?? 'guest';
+      final email = await secureStorage.read(key: 'user_email') ??
+          _config!.userEmail ??
+          'guest';
+      final cohort = await secureStorage.read(key: 'user_cohort') ??
+          _config!.userCohort ??
+          'guest';
 
       EventFirebaseDto eventDTO = EventFirebaseDto(
         eventName: eventName,

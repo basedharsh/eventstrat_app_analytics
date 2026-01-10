@@ -10,6 +10,7 @@ class AnalyticsConfig {
   final DeviceIdStrategy deviceIdStrategy;
   final String? methodChannelName;
   final bool enableFirebase;
+  final String? encryptionKey;
 
   const AnalyticsConfig({
     required this.targetProduct,
@@ -21,6 +22,7 @@ class AnalyticsConfig {
     this.deviceIdStrategy = DeviceIdStrategy.hardwareId,
     this.methodChannelName,
     this.enableFirebase = false,
+    this.encryptionKey,
   });
 
   AnalyticsConfig copyWith({
@@ -33,6 +35,7 @@ class AnalyticsConfig {
     DeviceIdStrategy? deviceIdStrategy,
     String? methodChannelName,
     bool? enableFirebase,
+    String? encryptionKey,
   }) {
     return AnalyticsConfig(
       targetProduct: targetProduct ?? this.targetProduct,
@@ -44,6 +47,7 @@ class AnalyticsConfig {
       deviceIdStrategy: deviceIdStrategy ?? this.deviceIdStrategy,
       methodChannelName: methodChannelName ?? this.methodChannelName,
       enableFirebase: enableFirebase ?? this.enableFirebase,
+      encryptionKey: encryptionKey ?? this.encryptionKey,
     );
   }
 }

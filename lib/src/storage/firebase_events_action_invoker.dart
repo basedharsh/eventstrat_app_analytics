@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../session/session_manager.dart';
 import '../tracking/analytics_config.dart';
 import 'package:path_provider/path_provider.dart';
+import '../utils/encryption_helper.dart';
 
 class AnalyticsEventsActionInvoker {
   final String apiEndpoint;
@@ -23,37 +24,43 @@ class AnalyticsEventsActionInvoker {
   Future<void> storeEventToLocal({
     required Map<String, dynamic> eventData,
   }) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      String analyticsString = prefs.getString('analytics') ?? '';
-      List<Map<String, dynamic>> decodedEvents = [];
+    final prefs = await SharedPreferences.getInstance();
+    String encryptedString = prefs.getString('analytics') ?? '';
+    List<Map<String, dynamic>> decodedEvents = [];
 
-      if (analyticsString.isNotEmpty) {
-        try {
-          final decodedJson = jsonDecode(analyticsString);
-          decodedEvents = (decodedJson as List)
-              .map((e) => e as Map<String, dynamic>)
-              .toList();
-        } catch (e) {
-          if (config?.enableDebugMode ?? false) {
-            log('ANALYTICS: [WARNING] Failed to decode existing events, starting fresh: ${e.toString()}');
-          }
-          decodedEvents = [];
+    // Decrypt existing events
+    if (encryptedString.isNotEmpty) {
+      try {
+        final decryptedString = EncryptionHelper.decryptData(encryptedString);
+        final decodedJson = jsonDecode(decryptedString);
+        decodedEvents = (decodedJson as List)
+            .map((e) => e as Map<String, dynamic>)
+            .toList();
+      } catch (e) {
+        decodedEvents = [];
+        if (config?.enableDebugMode ?? false) {
+          log('ANALYTICS: [ERROR] Failed to decode existing analytics events: ${e.toString()}');
         }
       }
-
-      decodedEvents.add(eventData);
-      String updatedAnalyticsString = jsonEncode(decodedEvents);
-      await prefs.setString('analytics', updatedAnalyticsString);
-
-      if (config?.enableDebugMode ?? false) {
-        log('ANALYTICS: [SUCCESS] Event stored locally. Total events in queue: ${decodedEvents.length}');
-      }
-    } catch (e) {
-      if (config?.enableDebugMode ?? false) {
-        log('ANALYTICS: [ERROR] Failed to store event locally: ${e.toString()}');
-      }
     }
+
+    decodedEvents.add(eventData);
+
+// Encrypt and store
+    String updatedAnalyticsString = jsonEncode(decodedEvents);
+    if (config?.enableDebugMode ?? false) {
+      log('ANALYTICS: [DEBUG] Updated analytics JSON length before encryption: ${updatedAnalyticsString.length}');
+
+      log('ANALYTICS: [DEBUG] Plain JSON length: ${updatedAnalyticsString.length}');
+    }
+    String encryptedData = EncryptionHelper.encryptData(updatedAnalyticsString);
+    if (config?.enableDebugMode ?? false) {
+      log('ANALYTICS: [DEBUG] Encrypted analytics string length: ${encryptedData.length}');
+
+      log('ANALYTICS: [DEBUG] Encrypted data length: ${encryptedData.length}');
+      log('ANALYTICS: [DEBUG] First 50 chars: ${encryptedData.substring(0, 50)}');
+    }
+    await prefs.setString('analytics', encryptedData);
   }
 
   Future<void> syncEventsToDB({Map<String, String>? additionalHeaders}) async {
@@ -75,7 +82,9 @@ class AnalyticsEventsActionInvoker {
 
       List<Map<String, dynamic>> decodedEvents = [];
       try {
-        final decodedJson = jsonDecode(analyticsString);
+        // Decrypt first
+        final decryptedString = EncryptionHelper.decryptData(analyticsString);
+        final decodedJson = jsonDecode(decryptedString);
         decodedEvents = (decodedJson as List)
             .map((e) => e as Map<String, dynamic>)
             .toList();
@@ -113,7 +122,6 @@ class AnalyticsEventsActionInvoker {
           ),
         ));
 
-        // Add file field with proper content type
         formData.files.add(MapEntry(
           'file',
           await MultipartFile.fromFile(

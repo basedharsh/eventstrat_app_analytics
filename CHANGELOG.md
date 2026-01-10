@@ -1,4 +1,11 @@
+## 2.0.0
+* vapt issue fixed events stored in encrypted format
+
 ## 0.0.7
+
+
+
+
 * api bug fixed
 ## 0.0.6
 * api call format change

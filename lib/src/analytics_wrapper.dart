@@ -15,6 +15,7 @@ class EventstratAnalytics {
     DeviceIdStrategy deviceIdStrategy = DeviceIdStrategy.hardwareId,
     bool enableFirebase = false,
     String? methodChannelName,
+    String? encryptionKey,
   }) {
     final config = AnalyticsConfig(
       targetProduct: targetProduct,
@@ -26,6 +27,7 @@ class EventstratAnalytics {
       deviceIdStrategy: deviceIdStrategy,
       enableFirebase: enableFirebase,
       methodChannelName: methodChannelName,
+      encryptionKey: encryptionKey,
     );
 
     EventManager.initialize(config);
