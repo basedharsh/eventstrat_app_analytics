@@ -10,6 +10,7 @@ class AnalyticsConfig {
   final DeviceIdStrategy deviceIdStrategy;
   final String? methodChannelName;
   final bool enableFirebase;
+  final bool enableBackendSync;
   final String? encryptionKey;
 
   const AnalyticsConfig({
@@ -22,6 +23,7 @@ class AnalyticsConfig {
     this.deviceIdStrategy = DeviceIdStrategy.hardwareId,
     this.methodChannelName,
     this.enableFirebase = false,
+    this.enableBackendSync = true,
     this.encryptionKey,
   });
 
@@ -35,6 +37,7 @@ class AnalyticsConfig {
     DeviceIdStrategy? deviceIdStrategy,
     String? methodChannelName,
     bool? enableFirebase,
+    bool? enableBackendSync,
     String? encryptionKey,
   }) {
     return AnalyticsConfig(
@@ -47,6 +50,7 @@ class AnalyticsConfig {
       deviceIdStrategy: deviceIdStrategy ?? this.deviceIdStrategy,
       methodChannelName: methodChannelName ?? this.methodChannelName,
       enableFirebase: enableFirebase ?? this.enableFirebase,
+      enableBackendSync: enableBackendSync ?? this.enableBackendSync,
       encryptionKey: encryptionKey ?? this.encryptionKey,
     );
   }

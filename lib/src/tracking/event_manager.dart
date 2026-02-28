@@ -125,12 +125,15 @@ class EventManager {
         );
       }
 
-      await _invoker!.storeEventToLocal(
-        eventData: await eventDTO.toJson(config: _config),
-      );
-
-      if (_config!.enableDebugMode) {
-        log('ANALYTICS: [SUCCESS] Event stored locally: $eventName');
+      if (_config!.enableBackendSync) {
+        await _invoker!.storeEventToLocal(
+          eventData: await eventDTO.toJson(config: _config),
+        );
+        if (_config!.enableDebugMode) {
+          log('ANALYTICS: [SUCCESS] Event stored locally: $eventName');
+        }
+      } else if (_config!.enableDebugMode) {
+        log('ANALYTICS: [INFO] Backend sync disabled. Skipping local event queue.');
       }
 
       // Log event to Firebase Analytics
@@ -150,6 +153,13 @@ class EventManager {
   }
 
   static Future<void> sync({Map<String, String>? headers}) async {
+    if (_config != null && !_config!.enableBackendSync) {
+      if (_config!.enableDebugMode) {
+        log('ANALYTICS: [INFO] Backend sync disabled. Skipping sync call.');
+      }
+      return;
+    }
+
     if (_invoker == null) {
       if (_config?.enableDebugMode ?? false) {
         log('ANALYTICS: [ERROR] EventManager not initialized');

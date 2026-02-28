@@ -65,6 +65,13 @@ class AnalyticsEventsActionInvoker {
 
   Future<void> syncEventsToDB({Map<String, String>? additionalHeaders}) async {
     try {
+      if (config != null && !config!.enableBackendSync) {
+        if (config?.enableDebugMode ?? false) {
+          log('ANALYTICS: [INFO] Backend sync disabled. Skipping upload.');
+        }
+        return;
+      }
+
       final prefs = await SharedPreferences.getInstance();
       String sessionId = SessionManager().sessionId;
       String analyticsString = prefs.getString('analytics') ?? '';

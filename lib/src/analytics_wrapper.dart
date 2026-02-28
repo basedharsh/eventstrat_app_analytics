@@ -1,6 +1,7 @@
 import 'tracking/analytics_config.dart';
 import 'tracking/event_manager.dart';
 import 'constants/event_actions.dart';
+import 'package:flutter/foundation.dart';
 
 class EventstratAnalytics {
   static bool _isInitialized = false;
@@ -14,9 +15,19 @@ class EventstratAnalytics {
     bool enableDebugMode = false,
     DeviceIdStrategy deviceIdStrategy = DeviceIdStrategy.hardwareId,
     bool enableFirebase = false,
+    bool enableBackendSync = true,
     String? methodChannelName,
     String? encryptionKey,
   }) {
+    // Firebase is allowed only in production (release) builds.
+    final effectiveEnableFirebase = enableFirebase && kReleaseMode;
+
+    if (!enableBackendSync && !effectiveEnableFirebase) {
+      throw StateError(
+        'Invalid analytics configuration: both backend sync and Firebase analytics are disabled. Firebase is only enabled in release builds. Enable at least one destination.',
+      );
+    }
+
     final config = AnalyticsConfig(
       targetProduct: targetProduct,
       apiEndpoint: apiEndpoint,
@@ -25,7 +36,8 @@ class EventstratAnalytics {
       headers: headers,
       enableDebugMode: enableDebugMode,
       deviceIdStrategy: deviceIdStrategy,
-      enableFirebase: enableFirebase,
+      enableFirebase: effectiveEnableFirebase,
+      enableBackendSync: enableBackendSync,
       methodChannelName: methodChannelName,
       encryptionKey: encryptionKey,
     );
